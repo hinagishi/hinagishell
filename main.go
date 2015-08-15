@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./utils"
 	"bufio"
 	"fmt"
 	"os"
@@ -8,11 +9,11 @@ import (
 	"strings"
 )
 
-type command []string
+type input []string
 
-func (c command) parse() int {
+func (c input) parse() int {
 	if c[0] == "pwd" {
-		fmt.Println(os.Getenv("PWD"))
+		utils.Pwd()
 	} else if c[0] == "cd" {
 		var path string
 		if len(c) < 2 {
@@ -20,16 +21,9 @@ func (c command) parse() int {
 		} else {
 			path = c[1]
 		}
-		if err := os.Chdir(path); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		path, err := os.Getwd()
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		os.Setenv("PWD", path)
+		utils.Cd(path)
+	} else if c[0] == "exit" {
+		os.Exit(0)
 	} else {
 		com := c[0]
 		cmd := exec.Command(com)
@@ -56,7 +50,7 @@ func main() {
 		if !scanner.Scan() {
 			break
 		}
-		var params command
+		var params input
 		params = strings.Split(scanner.Text(), " ")
 		params.parse()
 	}
